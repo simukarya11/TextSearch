@@ -1,0 +1,6 @@
+TODO
+
+1 - Add code for TextSearch.searchFile(){Handling all the errors}
+2 - Add logger support
+3 - Make code clean i.e Naming and Clean code guidelines
+4 - Add unit and integration tests
