@@ -2,6 +2,8 @@ use std::path::{Path, PathBuf};
 
 #[allow(non_snake_case)]
 use crate::OutputHandler::*;
+use std::fs::File;
+use std::io::prelude::*;
 
 /*----------Struct TextSearch------------------------------------------*/
 #[allow(non_snake_case)]
@@ -42,25 +44,36 @@ impl DirectoryEvent for TextSearch {
         self.display.setDirectory(dir);
     }
 
-    fn searchFile(&mut self, file: &Path) {
-        // TODO - Implement this function
-        /* 
-            Pretending to search for text in file.
-            Function should:
-              1. append flnm to dir
-              2. attempt to open file
-              3. search for text
-              4. send result to display 
-        */
-        if self.textToSearch == "BuildOn" {
-            self.display.displaySearchResult((file, true, &self.textToSearch));
+    #[allow(non_snake_case)]
+    fn searchFile(&mut self, foundFile: &Path) {
+        let mut newFilePath = self.searchDirectory.clone();
+        newFilePath.push(foundFile);
+
+        let openedFile = File::open(&newFilePath);
+
+        if openedFile.is_err() {
+            println!("File does not exist in directory {:?}", newFilePath);
+            return;
         }
-        else {
-            self.display.displaySearchResult((file, false, &self.textToSearch));
+
+        let mut fileRawData = openedFile.unwrap();
+        let mut fileContentInString = String::new();
+
+        match fileRawData.read_to_string(&mut fileContentInString) {
+            Err(reason) => println!("Could not convert raw data of to string due to -> {:?}", reason),
+            Ok(_) => println!(
+                "Converted raw data of to string successfully\n{:?}",
+                fileContentInString
+            ),
         }
+
+        let isTextFound = fileContentInString.find(&self.textToSearch);
+        self.display
+            .displaySearchResult((&newFilePath, isTextFound.is_some(), &self.textToSearch));
     }
 }
 
+/*************************************Unit Test************************************** */
 #[cfg(test)]
 #[allow(non_snake_case)]
 mod tests {

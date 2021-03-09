@@ -1,6 +1,6 @@
 use std::path::{Path, PathBuf};
 
-/*----------Struct GenerateOutput------------------------------------------*/
+/*----------Struct Display------------------------------------------*/
 
 #[allow(dead_code)]
 pub struct Display {
@@ -19,13 +19,13 @@ impl Display {
     }
 }
 
-pub trait DisplayEvent {
-    fn displaySearchResult(&mut self, result: (&Path, bool, &str)); 
+pub trait HandleDisplayEvent {
+    fn displaySearchResult(&mut self, result: (&Path, bool, &str));
 }
 
-impl DisplayEvent for Display {
+impl HandleDisplayEvent for Display {
     fn displaySearchResult(&mut self, result: (&Path, bool, &str)) {
-        let (filePath, textFound, searchText) =  result;
+        let (filePath, textFound, searchText) = result;
 
         if textFound {
             print!("\n    {:?}: {:?} found", filePath, searchText);
@@ -35,6 +35,7 @@ impl DisplayEvent for Display {
     }
 }
 
+/*************************************Unit Test************************************** */
 #[cfg(test)]
 #[allow(non_snake_case)]
 mod tests {
