@@ -1,6 +1,6 @@
 TODO
 
 1 - [DONE] Add code for TextSearch.searchFile() {Handling all the errors}
-2 - Add logger support
-3 - Make code clean i.e Naming and Clean code guidelines, add 100% unit tests
-4 - Add unit and integration tests
+2 - [DONE] Add logger support -> logger will be added in .executable
+3 - [Always in progress] Make code clean i.e Naming and Clean code guidelines, add 100% unit tests
+4 - [Added unit test] Add unit and integration tests

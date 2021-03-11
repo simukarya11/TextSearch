@@ -33,21 +33,21 @@ impl TextSearch {
 /*----------Impl Struct TextSearch for DirectoryEvent------------------------------------------*/
 
 #[allow(non_snake_case)]
-pub trait DirectoryEvent {
-    fn setSearchDirectory(&mut self, dir: &Path);
-    fn searchFile(&mut self, file: &Path);
+pub trait DirectorySearchEvent {
+    fn setSearchDirectory(&mut self, directory: &Path);
+    fn searchFile(&mut self, foundFilePath: &Path);
 }
 
-impl DirectoryEvent for TextSearch {
-    fn setSearchDirectory(&mut self, dir: &Path) {
-        self.searchDirectory = dir.to_path_buf();
-        self.display.setDirectory(dir);
+impl DirectorySearchEvent for TextSearch {
+    fn setSearchDirectory(&mut self, directory: &Path) {
+        self.searchDirectory = directory.to_path_buf();
+        self.display.setDirectory(directory);
     }
 
     #[allow(non_snake_case)]
-    fn searchFile(&mut self, foundFile: &Path) {
+    fn searchFile(&mut self, foundFilePath: &Path) {
         let mut newFilePath = self.searchDirectory.clone();
-        newFilePath.push(foundFile);
+        newFilePath.push(foundFilePath);
 
         let openedFile = File::open(&newFilePath);
 
@@ -61,10 +61,7 @@ impl DirectoryEvent for TextSearch {
 
         match fileRawData.read_to_string(&mut fileContentInString) {
             Err(reason) => println!("Could not convert raw data of to string due to -> {:?}", reason),
-            Ok(_) => println!(
-                "Converted raw data of to string successfully\n{:?}",
-                fileContentInString
-            ),
+            Ok(_) => {},
         }
 
         let isTextFound = fileContentInString.find(&self.textToSearch);
