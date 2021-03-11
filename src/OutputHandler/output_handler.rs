@@ -14,23 +14,23 @@ impl Display {
         }
     }
 
-    pub fn setDirectory(&mut self, directory: &Path) {
-        self.searchDirectory = directory.to_path_buf();
+    pub fn setDirectory(&mut self, dir: &Path) {
+        self.searchDirectory = dir.to_path_buf();
     }
 }
 
 pub trait HandleDisplayEvent {
-    fn displaySearchResult(&mut self, searchResult: (&Path, bool, &str));
+    fn displaySearchResult(&mut self, result: (&Path, bool, &str));
 }
 
 impl HandleDisplayEvent for Display {
-    fn displaySearchResult(&mut self, searchResult: (&Path, bool, &str)) {
-        let (filePath, textFound, searchText) = searchResult;
+    fn displaySearchResult(&mut self, result: (&Path, bool, &str)) {
+        let (filePath, textFound, searchText) = result;
 
         if textFound {
-            print!("Text -> {:?} was found in file ->  {:?} ", searchText, filePath);
+            print!("\n    {:?}: {:?} found", filePath, searchText);
         } else {
-            print!("Text -> {:?} was not found in file ->  {:?} ", searchText, filePath);
+            print!("\n    {:?}: {:?} not found", filePath, searchText);
         }
     }
 }
