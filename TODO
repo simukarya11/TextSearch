@@ -1,4 +1,4 @@
-TODO
+TODO TextSearch
 
 1 - [DONE] Add code for TextSearch.searchFile() {Handling all the errors}
 2 - [DONE] Add logger support -> logger will be added in .executable
