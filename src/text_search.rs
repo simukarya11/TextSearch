@@ -1,72 +1,96 @@
+#![allow(non_snake_case)]
+
 use std::path::{Path, PathBuf};
 
-#[allow(non_snake_case)]
 use crate::OutputHandler::*;
 use std::fs::File;
 use std::io::prelude::*;
+use DirectoryNavigator::DirectorySearchEvent;
 
 /*----------Struct TextSearch------------------------------------------*/
-#[allow(non_snake_case)]
 #[allow(dead_code)]
 pub struct TextSearch {
     searchDirectory: PathBuf,
     textToSearch: String,
-    display: Display,
+    display: Option<Box<dyn OutputTrait>>,
 }
 
-#[allow(non_snake_case)]
 #[allow(dead_code)]
 impl TextSearch {
     pub fn new() -> Self {
         TextSearch {
             searchDirectory: PathBuf::new(),
             textToSearch: String::new(),
-            display: Display::new(),
+            display: None,
         }
     }
 
-    pub fn setTextToSearch(&mut self, textToSeach: &str) {
-        self.textToSearch = textToSeach.to_string();
+    pub fn setTextToSearch(&mut self, textToSearch: &str) {
+        self.textToSearch = textToSearch.to_string();
+    }
+
+    pub fn setOutputObject(&mut self, displayImpl: Box<dyn OutputTrait>) {
+        self.display.replace(displayImpl);
     }
 }
 
-/*----------Impl Struct TextSearch for DirectoryEvent------------------------------------------*/
-
-#[allow(non_snake_case)]
-pub trait DirectorySearchEvent {
-    fn setSearchDirectory(&mut self, directory: &Path);
-    fn searchFile(&mut self, foundFilePath: &Path);
-}
+/*----------Impl Struct TextSearch for DirectoryEvent Trait initialized by DirectoryNavigator------------------------------------------*/
 
 impl DirectorySearchEvent for TextSearch {
     fn setSearchDirectory(&mut self, directory: &Path) {
         self.searchDirectory = directory.to_path_buf();
-        self.display.setDirectory(directory);
+        if let Some(plug) = &mut self.display {
+            plug.setDirectory(directory);
+        }
     }
 
-    #[allow(non_snake_case)]
     fn searchFile(&mut self, foundFilePath: &Path) {
         let mut newFilePath = self.searchDirectory.clone();
         newFilePath.push(foundFilePath);
 
-        let openedFile = File::open(&newFilePath);
-
-        if openedFile.is_err() {
-            println!("File does not exist in directory {:?}", newFilePath);
+        let openedFile = self.openFile(&newFilePath);
+        if openedFile.is_none() {
             return;
         }
 
-        let mut fileRawData = openedFile.unwrap();
-        let mut fileContentInString = String::new();
-
-        match fileRawData.read_to_string(&mut fileContentInString) {
-            Err(reason) => println!("Could not convert raw data of to string due to -> {:?}", reason),
-            Ok(_) => {},
+        let fileContentInString = self.readFileToString(&mut openedFile.unwrap());
+        if fileContentInString.is_none() {
+            return;
         }
 
-        let isTextFound = fileContentInString.find(&self.textToSearch);
-        self.display
-            .displaySearchResult((&newFilePath, isTextFound.is_some(), &self.textToSearch));
+        let isTextFound = fileContentInString.unwrap().find(&self.textToSearch);
+        self.displayResult(&newFilePath, isTextFound.is_some());
+    }
+}
+
+impl TextSearch {
+    fn openFile(&self, filePath: &std::path::PathBuf) -> Option<File> {
+        let openedFile = File::open(&filePath);
+        if openedFile.is_err() {
+            println!("File does not exist in directory {:?}", filePath);
+            return None;
+        }
+        return Some(openedFile.unwrap());
+    }
+
+    fn readFileToString(&self, fileRawData: &mut File) -> Option<String> {
+        let mut fileContentInString = String::new();
+        match fileRawData.read_to_string(&mut fileContentInString) {
+            Err(reason) => {
+                println!(
+                    "Could not convert raw data of to string due to -> {:?}",
+                    reason
+                );
+                return None;
+            }
+            Ok(_) => return Some(fileContentInString),
+        }
+    }
+
+    fn displayResult(&mut self, filePath: &std::path::PathBuf, isTextFound: bool) {
+        if let Some(display) = &mut self.display {
+            display.displaySearchResult((&filePath, isTextFound, &self.textToSearch));
+        }
     }
 }
 
