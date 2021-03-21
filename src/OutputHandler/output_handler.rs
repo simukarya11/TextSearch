@@ -1,11 +1,8 @@
+#![allow(dead_code)]
+
 use std::path::{Path, PathBuf};
 
 /*----------Struct Display------------------------------------------*/
-
-#[allow(dead_code)]
-pub struct Display {
-    searchDirectory: PathBuf,
-}
 
 pub trait OutputTrait {
     fn setDirectory(&mut self, directory: &Path);
@@ -13,6 +10,11 @@ pub trait OutputTrait {
 }
 /*_________________Uncomment to use DisplayImplementation____________________ */
 /*
+
+pub struct Display {
+    searchDirectory: PathBuf,
+}
+
 impl Display {
     pub fn new() -> Self {
         Display {

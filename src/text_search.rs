@@ -1,21 +1,20 @@
 #![allow(non_snake_case)]
+#![allow(dead_code)]
 
 use std::path::{Path, PathBuf};
 
 use crate::OutputHandler::*;
 use std::fs::File;
 use std::io::prelude::*;
-use DirectoryNavigator::DirectorySearchEvent;
+use DirectoryNavigator::DirectorySearchEventTrait;
 
 /*----------Struct TextSearch------------------------------------------*/
-#[allow(dead_code)]
 pub struct TextSearch {
     searchDirectory: PathBuf,
     textToSearch: String,
     display: Option<Box<dyn OutputTrait>>,
 }
 
-#[allow(dead_code)]
 impl TextSearch {
     pub fn new() -> Self {
         TextSearch {
@@ -36,7 +35,7 @@ impl TextSearch {
 
 /*----------Impl Struct TextSearch for DirectoryEvent Trait initialized by DirectoryNavigator------------------------------------------*/
 
-impl DirectorySearchEvent for TextSearch {
+impl DirectorySearchEventTrait for TextSearch {
     fn setSearchDirectory(&mut self, directory: &Path) {
         self.searchDirectory = directory.to_path_buf();
         if let Some(plug) = &mut self.display {
@@ -83,7 +82,7 @@ impl TextSearch {
                 );
                 return None;
             }
-            Ok(_) => return Some(fileContentInString),
+            Ok(_) => return Some(fileContentInString)
         }
     }
 
@@ -94,6 +93,9 @@ impl TextSearch {
     }
 }
 
+/*
+    TODO: Add unit tests for entire File
+ */
 /*************************************Unit Test************************************** */
 #[cfg(test)]
 #[allow(non_snake_case)]
